@@ -1,0 +1,21 @@
+paths:
+  template: templates/template.cpp
+  templates_dir: templates/
+  workspace: .
+
+compile:
+  command: g++
+  flags:
+    - -Wall
+    - -Wextra
+    - -Wconversion
+    - -std=c++20
+    - -lfmt
+
+file_naming:
+  problem: "{}.cpp"
+  input: "{}.txt"
+
+commands:
+  compile: "{compiler} {flags} {source} -o {executable}"
+  run: "./{executable} < {input_file}"
