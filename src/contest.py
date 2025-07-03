@@ -58,3 +58,13 @@ class ContestManager:
         actual = actual_output.strip().splitlines()
         expected = expected_output.strip().splitlines()
         return actual == expected
+
+    def write_input(self, contest_dir: Path, problem: str, content: str) -> None:
+        input_path = contest_dir / self.config.get_input_file_name(problem)
+        with open(input_path, "w") as f:
+            f.write(content.strip() + "\n")
+
+    def write_output(self, contest_dir: Path, problem: str, content: str) -> None:
+        output_path = contest_dir / self.config.get_output_file_name(problem)
+        with open(output_path, "w") as f:
+            f.write(content.strip() + "\n")

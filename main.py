@@ -113,6 +113,79 @@ def test(contest: str, problem: str):
 
 
 @app.command()
+def iotest(contest: str, problem: str):
+    """Interactively add input and expected output for a problem."""
+
+    contest_dir = Path(contest)
+    if not contest_dir.exists():
+        console.print(f"[red]Contest directory '{contest}' not found!")
+        raise typer.Exit(1)
+
+    problem_path = contest_dir / manager.config.get_problem_file_name(problem)
+    if not problem_path.exists():
+        console.print(f"[red]Problem {problem} not found in contest {contest}!")
+        raise typer.Exit(1)
+
+    console.print(
+        "\n[yellow]Paste your test input below (press Ctrl+D or Ctrl+Z on Windows when done):[/yellow]"
+    )
+    try:
+        input_content = []
+        while True:
+            try:
+                line = input()
+                input_content.append(line)
+            except EOFError:
+                break
+    except KeyboardInterrupt:
+        console.print("\n[red]Input cancelled![/red]")
+        raise typer.Exit(1)
+
+    if not input_content:
+        console.print("[red]No input provided![/red]")
+        raise typer.Exit(1)
+
+    input_text = "\n".join(input_content)
+    manager.write_input(contest_dir, problem, input_text)
+    console.print("\n[green]Test input saved successfully![/green]")
+
+    console.print(
+        "\n[yellow]Paste your expected output below (press Ctrl+D or Ctrl+Z on Windows when done):[/yellow]"
+    )
+    try:
+        output_content = []
+        while True:
+            try:
+                line = input()
+                output_content.append(line)
+            except EOFError:
+                break
+    except KeyboardInterrupt:
+        console.print("\n[red]Output cancelled![/red]")
+        raise typer.Exit(1)
+
+    if output_content:
+        output_text = "\n".join(output_content)
+        manager.write_output(contest_dir, problem, output_text)
+        console.print("\n[green]Expected output saved successfully![/green]")
+    else:
+        console.print(
+            "\n[yellow]No expected output provided. You can add it later.[/yellow]"
+        )
+
+    table = Table(title=f"Test Case for Problem {problem}")
+    table.add_column("Type", style="cyan")
+    table.add_column("Content", style="green")
+    table.add_row("Input", input_text)
+    if output_content:
+        table.add_row("Expected Output", output_text)
+    console.print(table)
+
+    if output_content and typer.confirm("\nWould you like to test the solution now?"):
+        test(contest, problem)
+
+
+@app.command()
 def config(action: str = typer.Argument("show", help="Action to perform: show/update")):
     """Show or update configuration."""
 
