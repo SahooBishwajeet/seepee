@@ -1,4 +1,5 @@
 import typer
+import click
 from pathlib import Path
 from typing import Optional, List
 from rich import print
@@ -16,6 +17,7 @@ def create(
     contest: str,
     problems: str = typer.Option("A-F", help="Problem range (e.g., 'A-D' or 'A,B,C')"),
 ):
+    """Create a new contest directory with problem files."""
 
     if "-" in problems:
         start, end = problems.split("-")
@@ -40,6 +42,7 @@ def create(
 
 @app.command()
 def run(contest: str, problem: str, input_content: Optional[str] = None):
+    """Compile and run a specific problem from a contest."""
 
     contest_dir = Path(contest)
     if not contest_dir.exists():
@@ -69,6 +72,7 @@ def run(contest: str, problem: str, input_content: Optional[str] = None):
 
 @app.command()
 def test(contest: str, problem: str):
+    """Run a problem and verify output against expected output file."""
 
     contest_dir = Path(contest)
     problem_path = contest_dir / manager.config.get_problem_file_name(problem)
@@ -106,6 +110,110 @@ def test(contest: str, problem: str):
     )
     table.add_row(expected_output, output)
     console.print(table)
+
+
+@app.command()
+def config(action: str = typer.Argument("show", help="Action to perform: show/update")):
+    """Show or update configuration."""
+
+    if action == "show":
+        show_config()
+    elif action == "update":
+        update_config()
+    else:
+        console.print("[red]Invalid action. Use 'show' or 'update'[/red]")
+        raise typer.Exit(1)
+
+
+def show_config():
+    """Display current configuration."""
+
+    compiler_table = Table(title="Compiler Settings")
+    compiler_table.add_column("Setting", style="cyan")
+    compiler_table.add_column("Value", style="green")
+
+    compiler_table.add_row("Compiler", manager.config.config["compile"]["command"])
+    compiler_table.add_row("Flags", " ".join(manager.config.get_compiler_flags()))
+    console.print(compiler_table)
+
+    paths_table = Table(title="\nPath Settings")
+    paths_table.add_column("Setting", style="cyan")
+    paths_table.add_column("Value", style="green")
+
+    for key, value in manager.config.config["paths"].items():
+        paths_table.add_row(key.replace("_", " ").title(), str(value))
+    console.print(paths_table)
+
+    naming_table = Table(title="\nFile Naming Patterns")
+    naming_table.add_column("File Type", style="cyan")
+    naming_table.add_column("Pattern", style="green")
+
+    for key, value in manager.config.config["file_naming"].items():
+        naming_table.add_row(key.replace("_", " ").title(), value)
+    console.print(naming_table)
+
+
+def update_config():
+    """Update configuration interactively."""
+    options = [
+        "Cancel",
+        "Compiler",
+        "Compiler Flags",
+        "Default Template",
+        "Templates Directory",
+    ]
+
+    console.print("\nWhat would you like to update?")
+    for idx, option in enumerate(options):
+        console.print(f"{idx}. {option}")
+
+    try:
+        choice_num = int(typer.prompt("Enter the number of your choice", default="0"))
+    except ValueError:
+        console.print("[red]Invalid input. Exiting.[/red]")
+        return
+
+    if not (0 <= choice_num < len(options)):
+        console.print("[red]Choice out of range. Exiting.[/red]")
+        return
+
+    choice = options[choice_num]
+
+    if choice == "Cancel":
+        return
+
+    if choice == "Compiler":
+        new_compiler = typer.prompt(
+            "Enter new compiler", default=manager.config.config["compile"]["command"]
+        )
+        manager.config.update_compiler(new_compiler)
+        console.print("[green]Compiler updated successfully![/green]")
+
+    elif choice == "Compiler Flags":
+        current_flags = " ".join(manager.config.get_compiler_flags())
+        new_flags = typer.prompt(
+            "Enter compiler flags (space-separated)", default=current_flags
+        )
+        manager.config.update_compiler_flags(new_flags.split())
+        console.print("[green]Compiler flags updated successfully![/green]")
+
+    elif choice == "Default Template":
+        template_path = typer.prompt(
+            "Enter template path (relative to workspace)",
+            default=manager.config.config["paths"]["template"],
+        )
+        manager.config.update_template(template_path)
+        console.print("[green]Default template updated successfully![/green]")
+
+    elif choice == "Templates Directory":
+        templates_dir = typer.prompt(
+            "Enter templates directory path",
+            default=manager.config.config["paths"]["templates_dir"],
+        )
+        manager.config.update_templates_dir(templates_dir)
+        console.print("[green]Templates directory updated successfully![/green]")
+
+    show_config()
 
 
 if __name__ == "__main__":

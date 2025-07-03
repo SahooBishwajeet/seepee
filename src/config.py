@@ -54,3 +54,28 @@ class Config:
 
     def get_templates_dir(self) -> Path:
         return Path(self.config["paths"]["templates_dir"])
+
+    def update_config_value(self, section: str, key: str, value: Any) -> None:
+        if section not in self.config:
+            self.config[section] = {}
+        self.config[section][key] = value
+        self.save_config()
+
+    def get_compiler_flags(self) -> List[str]:
+        return self.config["compile"]["flags"]
+
+    def update_compiler_flags(self, flags: List[str]) -> None:
+        self.config["compile"]["flags"] = flags
+        self.save_config()
+
+    def update_compiler(self, compiler: str) -> None:
+        self.config["compile"]["command"] = compiler
+        self.save_config()
+
+    def update_template(self, template: str) -> None:
+        self.config["paths"]["template"] = template
+        self.save_config()
+
+    def update_templates_dir(self, templates_dir: str) -> None:
+        self.config["paths"]["templates_dir"] = templates_dir
+        self.save_config()
