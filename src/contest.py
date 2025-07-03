@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+from typing import Optional
 from pathlib import Path
 from .config import Config
 
@@ -14,8 +15,13 @@ class ContestManager:
         contest_dir.mkdir(parents=True, exist_ok=True)
         return contest_dir
 
-    def create_problem_files(self, contest_dir: Path, problem_numbers: list[str]):
-        template_path = self.config.get_template_path()
+    def create_problem_files(
+        self,
+        contest_dir: Path,
+        problem_numbers: list[str],
+        template_name: Optional[str] = None,
+    ):
+        template_path = self.get_template_path(template_name)
 
         for prob in problem_numbers:
             prob_file = contest_dir / self.config.get_problem_file_name(prob)
@@ -68,3 +74,17 @@ class ContestManager:
         output_path = contest_dir / self.config.get_output_file_name(problem)
         with open(output_path, "w") as f:
             f.write(content.strip() + "\n")
+
+    def list_templates(self) -> list[str]:
+        templates_dir = self.config.get_templates_dir()
+        if not templates_dir.exists():
+            return []
+
+        return [f.name for f in templates_dir.glob("*.cpp")]
+
+    def get_template_path(self, template_name: str = None) -> Path:
+        if template_name:
+            template_path = self.config.get_templates_dir() / template_name
+            if template_path.exists():
+                return template_path
+        return self.config.get_template_path()

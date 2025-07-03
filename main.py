@@ -15,7 +15,9 @@ manager = ContestManager()
 @app.command()
 def create(
     contest: str,
-    problems: str = typer.Option("A-F", help="Problem range (e.g., 'A-D' or 'A,B,C')"),
+    problems: str = typer.Argument(
+        "A-F", help="Problem range (e.g., 'A-D' or 'A,B,C')"
+    ),
 ):
     """Create a new contest directory with problem files."""
 
@@ -25,17 +27,43 @@ def create(
     else:
         problems_list = problems.split(",")
 
-    contest_dir = manager.create_contest_dir(contest)
-    manager.create_problem_files(contest_dir, problems_list)
+    # List available templates
+    templates = manager.list_templates()
+    default_template = Path(manager.config.config["paths"]["template"]).name
 
+    if templates:
+        console.print("\nAvailable templates:")
+        for idx, template in enumerate(templates):
+            is_default = "(default)" if template == default_template else ""
+            console.print(f"{idx}. {template} {is_default}")
+
+        try:
+            choice = typer.prompt(
+                "\nChoose template number (press Enter for default)",
+                default=-1,
+                type=int,
+            )
+            template_name = templates[choice] if 0 <= choice < len(templates) else None
+        except (ValueError, IndexError):
+            template_name = None
+    else:
+        template_name = None
+
+    contest_dir = manager.create_contest_dir(contest)
+    manager.create_problem_files(contest_dir, problems_list, template_name)
+
+    # Show creation summary
     table = Table(title=f"Contest {contest} Created")
     table.add_column("Problem", style="cyan")
     table.add_column("Files Created", style="green")
+    table.add_column("Template", style="yellow")
 
+    template_used = template_name or default_template
     for prob in problems_list:
         cpp_file = manager.config.get_problem_file_name(prob)
         txt_file = manager.config.get_input_file_name(prob)
-        table.add_row(prob, f"{cpp_file}, {txt_file}")
+        out_file = manager.config.get_output_file_name(prob)
+        table.add_row(prob, f"{cpp_file}, {txt_file}, {out_file}", template_used)
 
     console.print(table)
 
