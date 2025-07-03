@@ -68,11 +68,25 @@ def run(contest: str, problem: str, input_content: Optional[str] = None):
 
 
 @app.command()
-def test(contest: str, problem: str, expected_output: str):
+def test(contest: str, problem: str):
 
     contest_dir = Path(contest)
     problem_path = contest_dir / manager.config.get_problem_file_name(problem)
     input_path = contest_dir / manager.config.get_input_file_name(problem)
+    output_path = contest_dir / manager.config.get_output_file_name(problem)
+
+    if not output_path.exists():
+        console.print(
+            f"\n[yellow]Warning: Expected output file {output_path} not found![/yellow]"
+        )
+        console.print(
+            "[yellow]Creating empty output file. Please add expected output to this file.[/yellow]"
+        )
+        output_path.touch()
+        raise typer.Exit(1)
+
+    with open(output_path) as f:
+        expected_output = f.read()
 
     output, error, success = manager.compile_and_run(problem_path, input_path)
     if not success:
@@ -84,11 +98,14 @@ def test(contest: str, problem: str, expected_output: str):
         console.print("\n[green]✓ Output matches expected output![/green]")
     else:
         console.print("\n[red]✗ Output does not match expected output![/red]")
-        table = Table(title="Output Comparison")
-        table.add_column("Expected", style="green")
-        table.add_column("Got", style="red")
-        table.add_row(expected_output, output)
-        console.print(table)
+
+    table = Table(title="Output Comparison")
+    table.add_column("Expected", style="green")
+    table.add_column(
+        "Got", style="blue" if manager.verify_output(output, expected_output) else "red"
+    )
+    table.add_row(expected_output, output)
+    console.print(table)
 
 
 if __name__ == "__main__":

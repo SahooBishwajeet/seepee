@@ -15,6 +15,7 @@ compile:
 file_naming:
   problem: "{}.cpp"
   input: "{}.txt"
+  output: "{}_out.txt"
 
 commands:
   compile: "{compiler} {flags} {source} -o {executable}"

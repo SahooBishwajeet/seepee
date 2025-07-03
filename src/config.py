@@ -43,6 +43,9 @@ class Config:
     def get_input_file_name(self, problem_number: str) -> str:
         return self.config["file_naming"]["input"].format(problem_number)
 
+    def get_output_file_name(self, problem_number: str) -> str:
+        return self.config["file_naming"]["output"].format(problem_number)
+
     def get_template_path(self) -> Path:
         return Path(self.config["paths"]["template"])
 

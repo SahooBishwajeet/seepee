@@ -20,11 +20,14 @@ class ContestManager:
         for prob in problem_numbers:
             prob_file = contest_dir / self.config.get_problem_file_name(prob)
             input_file = contest_dir / self.config.get_input_file_name(prob)
+            output_file = contest_dir / self.config.get_output_file_name(prob)
 
             if not prob_file.exists():
                 shutil.copy2(template_path, prob_file)
             if not input_file.exists():
                 input_file.touch()
+            if not output_file.exists():
+                output_file.touch()
 
     def compile_and_run(
         self, problem_path: Path, input_path: Path
