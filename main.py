@@ -27,7 +27,6 @@ def create(
     else:
         problems_list = problems.split(",")
 
-    # List available templates
     templates = manager.list_templates()
     default_template = Path(manager.config.config["paths"]["template"]).name
 
@@ -52,7 +51,6 @@ def create(
     contest_dir = manager.create_contest_dir(contest)
     manager.create_problem_files(contest_dir, problems_list, template_name)
 
-    # Show creation summary
     table = Table(title=f"Contest {contest} Created")
     table.add_column("Problem", style="cyan")
     table.add_column("Files Created", style="green")
@@ -315,6 +313,14 @@ def update_config():
         console.print("[green]Templates directory updated successfully![/green]")
 
     show_config()
+
+
+@app.command()
+def tui():
+    """Launch the Terminal User Interface."""
+    from src.tui import run_tui
+
+    run_tui()
 
 
 if __name__ == "__main__":
