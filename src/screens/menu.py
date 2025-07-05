@@ -11,6 +11,9 @@ class MainMenu(BaseScreen):
 
     BINDINGS = [Binding("q", "quit", "Quit", show=True), *BaseScreen.BINDINGS]
 
+    def on_mount(self) -> None:
+        self.add_class("menu-screen")
+
     def compose(self) -> ComposeResult:
         yield Header()
         with Container():

@@ -18,14 +18,33 @@ class SeePeeTUI(App):
     CSS = """
     Screen {
         align: center middle;
+        height: 100%;
+        width: 100%;
+        padding: 2;
+    }
+
+    Screen.menu-screen {
+        overflow: hidden;
     }
 
     Container {
-        width: 80%;
+        width: 90%;
+        min-width: 50;
+        max-width: 120;
         height: auto;
+        min-height: 20;
+        max-height: 80vh;
         background: $panel;
         border: solid $primary;
         padding: 1;
+        overflow-y: auto;
+    }
+
+    Vertical {
+        height: auto;
+        width: 100%;
+        min-height: 10;
+        overflow-y: auto;
     }
 
     Button {
@@ -35,10 +54,19 @@ class SeePeeTUI(App):
 
     Input {
         margin: 1;
+        width: 100%;
     }
 
     Select {
         margin: 1;
+        width: 100%;
+    }
+
+    TextArea {
+        height: auto;
+        min-height: 5;
+        max-height: 20;
+        width: 100%;
     }
 
     #app-header {
@@ -49,6 +77,13 @@ class SeePeeTUI(App):
         color: $text;
         border: solid $primary;
         margin-bottom: 1;
+    }
+
+    #input_section, #output_section {
+        width: 1fr;
+        height: auto;
+        min-height: 10;
+        margin: 1;
     }
     """
 
