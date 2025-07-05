@@ -18,72 +18,88 @@ class SeePeeTUI(App):
     CSS = """
     Screen {
         align: center middle;
-        height: 100%;
-        width: 100%;
-        padding: 2;
+        layers: base overlay;
     }
 
-    Screen.menu-screen {
-        overflow: hidden;
-    }
-
-    Container {
+    Screen > Container {
         width: 90%;
         min-width: 50;
         max-width: 120;
         height: auto;
         min-height: 20;
-        max-height: 80vh;
+        max-height: 90vh;
         background: $panel;
         border: solid $primary;
-        padding: 1;
         overflow-y: auto;
+        padding: 1 2;
+        layout: vertical;
+    }
+
+    Screen.menu-screen > Container, Screen.iotest-screen > Container {
+        height: 100%;
+        max-height: 95vh;
     }
 
     Vertical {
-        height: auto;
         width: 100%;
-        min-height: 10;
-        overflow-y: auto;
+        height: auto;
+        margin-bottom: 1;
+    }
+
+    Horizontal {
+        height: auto;
+        margin: 1 0;
     }
 
     Button {
         width: 100%;
-        margin: 1;
+        margin: 0 0 1 0;
     }
 
     Input {
-        margin: 1;
         width: 100%;
+        margin: 0 0 1 0;
     }
 
     Select {
-        margin: 1;
         width: 100%;
+        margin: 0 0 1 0;
     }
 
     TextArea {
-        height: auto;
-        min-height: 5;
-        max-height: 20;
         width: 100%;
+        height: auto;
+        min-height: 3;
+        margin: 0 0 1 0;
     }
 
-    #app-header {
-        text-align: center;
-        padding: 1;
-        text-style: bold;
-        background: $accent;
-        color: $text;
-        border: solid $primary;
-        margin-bottom: 1;
+    Label {
+        margin: 1 0;
+        padding: 0;
     }
 
     #input_section, #output_section {
         width: 1fr;
         height: auto;
-        min-height: 10;
-        margin: 1;
+    }
+
+    #input TextArea, #output TextArea {
+        overflow: hidden;
+        height: auto;
+    }
+
+    #app-header {
+        dock: top;
+        text-align: center;
+        background: $accent;
+        color: $text;
+        border: solid $primary;
+        padding: 1;
+        margin-bottom: 1;
+    }
+
+    Screen.create-screen Button {
+        margin-top: 1;
     }
     """
 

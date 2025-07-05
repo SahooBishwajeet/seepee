@@ -9,6 +9,9 @@ from .base import BaseScreen
 
 class CreateContestScreen(BaseScreen):
 
+    def on_mount(self) -> None:
+        self.add_class("create-screen")
+
     def compose(self) -> ComposeResult:
         yield Header()
         with Container():
